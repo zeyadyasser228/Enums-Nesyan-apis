@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BFCAI.Nesyan — Interactive Enums Directory</title>
+    <meta name="description" content="Explore and inspect C# enumeration definitions, database configurations, mapping references, and code declarations in the BFCAI.Nesyan backend.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Theme variables - Dark Mode (Default) */
+            --bg-color: #0b0f19;
+            --surface-color: rgba(22, 28, 45, 0.6);
+            --surface-border: rgba(255, 255, 255, 0.08);
+            --surface-hover: rgba(30, 41, 67, 0.85);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --accent-primary: #8b5cf6; /* Violet */
+            --accent-secondary: #06b6d4; /* Cyan */
+            --accent-pink: #ec4899; /* Pink */
+            --accent-bg: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+            --header-bg: rgba(11, 15, 25, 0.8);
+            --badge-bg: rgba(139, 92, 246, 0.15);
+            --badge-text: #a78bfa;
+            --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            --code-bg: #111827;
+            --input-bg: rgba(17, 24, 39, 0.8);
+            --drawer-bg: #0d121f;
+            --toast-bg: rgba(139, 92, 246, 0.95);
+            --glow-color: rgba(139, 92, 246, 0.25);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="light"] {
+            /* Theme variables - Light Mode */
+            --bg-color: #f8fafc;
+            --surface-color: rgba(255, 255, 255, 0.7);
+            --surface-border: rgba(0, 0, 0, 0.06);
+            --surface-hover: rgba(255, 255, 255, 0.95);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --accent-primary: #6366f1; /* Indigo */
+            --accent-secondary: #0ea5e9; /* Sky Blue */
+            --accent-pink: #db2777;
+            --accent-bg: linear-gradient(135deg, #6366f1 0%, #0ea5e9 100%);
+            --header-bg: rgba(248, 250, 252, 0.8);
+            --badge-bg: rgba(99, 102, 241, 0.1);
+            --badge-text: #4f46e5;
+            --card-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05);
+            --code-bg: #f1f5f9;
+            --input-bg: #ffffff;
+            --drawer-bg: #ffffff;
+            --toast-bg: rgba(99, 102, 241, 0.95);
+            --glow-color: rgba(99, 102, 241, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        html, body {
+            width: 100%;
+            overflow-x: hidden;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            position: relative;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        /* Ambient Glow Backgrounds */
+        .ambient-glow-1 {
+            position: absolute;
+            top: -200px;
+            right: -100px;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, rgba(139, 92, 246, 0) 70%);
+            z-index: -1;
+            pointer-events: none;
+            transition: var(--transition);
+        }
+
+        .ambient-glow-2 {
+            position: absolute;
+            bottom: -200px;
+            left: -200px;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.12) 0%, rgba(6, 182, 212, 0) 70%);
+            z-index: -1;
+            pointer-events: none;
+            transition: var(--transition);
+        }
+
+        [data-theme="light"] .ambient-glow-1 {
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.06) 0%, rgba(99, 102, 241, 0) 70%);
+        }
+
+        [data-theme="light"] .ambient-glow-2 {
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.05) 0%, rgba(14, 165, 233, 0) 70%);
+        }
+
+        /* Container & Grid Setup */
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            box-sizing: border-box;
+        }
+
+        /* Elegant Navbar styling */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            width: 100%;
+            background: var(--header-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--surface-border);
+            transition: var(--transition);
+        }
+
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 1.5rem;
+            box-sizing: border-box;
+        }
+
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            background: var(--accent-bg);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 1.25rem;
+            box-shadow: 0 4px 15px var(--glow-color);
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+        }
+
+        .logo-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        /* Actions group (Theme + Counters) */
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .theme-toggle-btn {
+            background: var(--input-bg);
+            border: 1px solid var(--surface-border);
+            color: var(--text-primary);
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            box-shadow: var(--card-shadow);
+        }
+
+        .theme-toggle-btn:hover {
+            transform: scale(1.05);
+            border-color: var(--accent-primary);
+        }
+
+        .theme-toggle-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+        }
+
+        .theme-toggle-btn .sun-icon { display: none; }
+        [data-theme="light"] .theme-toggle-btn .moon-icon { display: none; }
+        [data-theme="light"] .theme-toggle-btn .sun-icon { display: block; }
+
+        /* Welcome / Hero Section */
+        .hero {
+            text-align: center;
+            padding: 3rem 1rem 2rem 1rem;
+            max-width: 800px;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        .hero h1 {
+            font-size: 2.75rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 0.75rem;
+            background: var(--accent-bg);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            line-height: 1.6;
+        }
+
+        /* Search and Filter Section */
+        .controls-panel {
+            width: 100%;
+            background: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            transition: var(--transition);
+            box-sizing: border-box;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .search-wrapper {
+            position: relative;
+            flex-grow: 1;
+            width: 100%;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            width: 20px;
+            height: 20px;
+            pointer-events: none;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.85rem 1rem 0.85rem 3rem;
+            font-size: 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--surface-border);
+            background: var(--input-bg);
+            color: var(--text-primary);
+            outline: none;
+            transition: var(--transition);
+            box-sizing: border-box;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 4px var(--glow-color);
+        }
+
+        .filters-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .filter-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-right: 0.25rem;
+        }
+
+        .filter-chip {
+            background: var(--input-bg);
+            border: 1px solid var(--surface-border);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-chip:hover {
+            color: var(--text-primary);
+            border-color: var(--accent-primary);
+        }
+
+        .filter-chip.active {
+            background: var(--accent-primary);
+            color: #ffffff;
+            border-color: var(--accent-primary);
+            box-shadow: 0 4px 12px var(--glow-color);
+        }
+
+        .counter-badge {
+            background: rgba(255, 255, 255, 0.2);
+            color: currentColor;
+            padding: 0.1rem 0.4rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        /* Enums Grid */
+        .enums-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr));
+            gap: 1.5rem;
+            width: 100%;
+            transition: var(--transition);
+        }
+
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            border-radius: 20px;
+            color: var(--text-secondary);
+        }
+
+        .no-results svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1rem;
+            color: var(--text-muted);
+        }
+
+        /* Enum Card Styling */
+        .enum-card {
+            width: 100%;
+            box-sizing: border-box;
+            background: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .enum-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent-bg);
+            opacity: 0.8;
+            transition: var(--transition);
+        }
+
+        .enum-card:hover {
+            transform: translateY(-5px);
+            background: var(--surface-hover);
+            border-color: var(--accent-primary);
+            box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.35), 0 0 15px var(--glow-color);
+        }
+
+        .enum-header {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .enum-namespace-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .enum-badge {
+            background: var(--badge-bg);
+            color: var(--badge-text);
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .enum-file-link {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: var(--transition);
+        }
+
+        .enum-file-link:hover {
+            color: var(--accent-secondary);
+        }
+
+        .enum-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .enum-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            min-height: 40px;
+        }
+
+        /* Inner Values List inside Card */
+        .enum-values-container {
+            border-top: 1px solid var(--surface-border);
+            padding-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex-grow: 1;
+        }
+
+        .value-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.15);
+            font-size: 0.875rem;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            transition: var(--transition);
+        }
+
+        [data-theme="light"] .value-item {
+            background: rgba(0, 0, 0, 0.02);
+            border-color: rgba(0, 0, 0, 0.03);
+        }
+
+        .value-item:hover {
+            background: rgba(139, 92, 246, 0.08);
+            border-color: rgba(139, 92, 246, 0.2);
+            transform: translateX(4px);
+        }
+
+        .value-name {
+            font-family: 'Fira Code', monospace;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .value-number {
+            font-family: 'Fira Code', monospace;
+            font-weight: 700;
+            color: var(--accent-secondary);
+            background: rgba(6, 182, 212, 0.1);
+            padding: 0.1rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .enum-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px solid var(--surface-border);
+            padding-top: 1rem;
+        }
+
+        .values-count {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .inspect-btn {
+            background: transparent;
+            border: 1px solid var(--surface-border);
+            color: var(--text-secondary);
+            padding: 0.4rem 0.85rem;
+            border-radius: 8px;
+            font-size: 0.825rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: var(--transition);
+        }
+
+        .enum-card:hover .inspect-btn {
+            border-color: var(--accent-primary);
+            color: var(--text-primary);
+            background: var(--accent-primary);
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);
+        }
+
+        /* Drawer Overlay */
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+        }
+
+        .drawer-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Drawer Slide-out container */
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 600px;
+            height: 100%;
+            background: var(--drawer-bg);
+            box-shadow: -10px 0 40px rgba(0, 0, 0, 0.6);
+            z-index: 101;
+            display: flex;
+            flex-direction: column;
+            transform: translateX(100%);
+            visibility: hidden;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s;
+            box-sizing: border-box;
+        }
+
+        .drawer.active {
+            transform: translateX(0);
+            visibility: visible;
+        }
+
+        .drawer-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--surface-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .drawer-header-left {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .drawer-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        .drawer-close {
+            background: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            color: var(--text-secondary);
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .drawer-close:hover {
+            color: var(--text-primary);
+            border-color: var(--accent-pink);
+            background: rgba(236, 72, 153, 0.1);
+        }
+
+        .drawer-content {
+            padding: 1.5rem;
+            overflow-y: auto;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .drawer-meta-section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--surface-border);
+            border-radius: 12px;
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        [data-theme="light"] .drawer-meta-section {
+            background: rgba(0, 0, 0, 0.01);
+        }
+
+        .meta-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .meta-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .meta-value {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* Tabs inside Drawer */
+        .drawer-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--surface-border);
+            gap: 0.5rem;
+        }
+
+        .drawer-tab {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: var(--text-secondary);
+            padding: 0.6rem 1rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .drawer-tab:hover {
+            color: var(--text-primary);
+        }
+
+        .drawer-tab.active {
+            color: var(--accent-primary);
+            border-bottom-color: var(--accent-primary);
+        }
+
+        /* Code block wrapper with copy button */
+        .code-container {
+            position: relative;
+            background: var(--code-bg);
+            border: 1px solid var(--surface-border);
+            border-radius: 12px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .code-container.active {
+            display: block;
+        }
+
+        .code-header {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid var(--surface-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-family: 'Fira Code', monospace;
+        }
+
+        .copy-code-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--surface-border);
+            color: var(--text-secondary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: var(--transition);
+        }
+
+        .copy-code-btn:hover {
+            background: var(--accent-primary);
+            color: #ffffff;
+            border-color: var(--accent-primary);
+        }
+
+        .code-pre {
+            padding: 1.25rem;
+            margin: 0;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: #38bdf8; /* Soft blue */
+        }
+
+        [data-theme="light"] .code-pre {
+            color: #0369a1;
+        }
+
+        /* Custom syntax colors */
+        .keyword { color: #f43f5e; font-weight: 600; }
+        .type { color: #10b981; }
+        .number { color: #f59e0b; }
+        .string { color: #10b981; }
+        .comment { color: var(--text-muted); font-style: italic; }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--toast-bg);
+            color: #ffffff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            z-index: 200;
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+        }
+
+        .toast.active {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Footer styling */
+        footer {
+            margin-top: 5rem;
+            border-top: 1px solid var(--surface-border);
+            padding: 2rem 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            box-sizing: border-box;
+        }
+
+        /* Mobile Optimization and Responsiveness (Critical) */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0.75rem 1rem;
+            }
+
+            .logo-title {
+                font-size: 1.1rem;
+            }
+
+            .logo-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 1.1rem;
+                border-radius: 8px;
+            }
+
+            .hero {
+                padding: 2rem 0.5rem 1.5rem 0.5rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .container {
+                padding: 1.25rem 0.75rem;
+            }
+
+            .controls-panel {
+                padding: 1rem;
+                gap: 1rem;
+                border-radius: 16px;
+                width: 100%;
+            }
+
+            .search-row {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .search-input {
+                font-size: 0.95rem;
+                padding: 0.8rem 1rem 0.8rem 2.75rem;
+            }
+
+            .search-icon {
+                left: 0.85rem;
+                width: 18px;
+                height: 18px;
+            }
+
+            .filter-chip {
+                padding: 0.4rem 0.85rem;
+                font-size: 0.8rem;
+            }
+
+            .enums-grid {
+                grid-template-columns: 1fr;
+                gap: 1.25rem;
+                width: 100%;
+            }
+
+            .enum-card {
+                padding: 1.25rem;
+                width: 100%;
+            }
+
+            .drawer {
+                width: 100%;
+                height: 85%;
+                top: auto;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                transform: translateY(100%);
+                visibility: hidden;
+                border-radius: 24px 24px 0 0;
+                transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s;
+                box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+            }
+
+            .drawer.active {
+                transform: translateY(0);
+                visibility: visible;
+            }
+
+            .drawer-meta-section {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem 0.5rem;
+            }
+
+            .filter-label {
+                width: 100%;
+                margin-bottom: 0.25rem;
+            }
+
+            .logo-subtitle {
+                font-size: 0.65rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ambient Backdrops -->
+    <div class="ambient-glow-1"></div>
+    <div class="ambient-glow-2"></div>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="navbar">
+            <a href="#" class="logo-group" id="navLogo">
+                <div class="logo-icon">N</div>
+                <div class="logo-text">
+                    <span class="logo-title">Nesyan Backend</span>
+                    <span class="logo-subtitle">Domain System</span>
+                </div>
+            </a>
+            
+            <div class="nav-actions">
+                <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle visual theme">
+                    <!-- Moon Icon (Dark Mode) -->
+                    <svg class="moon-icon" viewBox="0 0 24 24">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <!-- Sun Icon (Light Mode) -->
+                    <svg class="sun-icon" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Hero Introduction -->
+        <section class="hero">
+            <h1 id="mainHeading">Backend Enumerations</h1>
+            <p>Explore all domain enumeration definitions, mapping constraints, and data models of the <strong>BFCAI.Nesyan</strong> medical software architecture.</p>
+        </section>
+
+        <!-- Controls (Search + Filters) -->
+        <div class="controls-panel">
+            <div class="search-row">
+                <div class="search-wrapper">
+                    <!-- Search Icon SVG -->
+                    <svg class="search-icon" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" class="search-input" id="searchInput" placeholder="Search by enum name, value label, value ID, or description..." aria-label="Search enums">
+                </div>
+            </div>
+            
+            <div class="filters-row">
+                <span class="filter-label">Filter Category:</span>
+                <button class="filter-chip active" data-filter="all" id="filterAll">
+                    All <span class="counter-badge" id="countAll">9</span>
+                </button>
+                <button class="filter-chip" data-filter="Primary" id="filterPrimary">
+                    Primary/Users <span class="counter-badge" id="countPrimary">3</span>
+                </button>
+                <button class="filter-chip" data-filter="Assessments" id="filterAssessments">
+                    Assessments <span class="counter-badge" id="countAssessments">3</span>
+                </button>
+                <button class="filter-chip" data-filter="Medications" id="filterMedications">
+                    Medications <span class="counter-badge" id="countMedications">2</span>
+                </button>
+                <button class="filter-chip" data-filter="Relations" id="filterRelations">
+                    Relations <span class="counter-badge" id="countRelations">1</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Enums Display Grid -->
+        <main class="enums-grid" id="enumsGrid"></main>
+    </div>
+
+    <!-- Inspector Drawer Overlay -->
+    <div class="drawer-overlay" id="drawerOverlay"></div>
+
+    <!-- Inspector Drawer Sidebar -->
+    <div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+        <div class="drawer-header">
+            <div class="drawer-header-left">
+                <span class="enum-badge" id="drawerCategory">Namespace</span>
+                <h2 class="drawer-title" id="drawerTitle">EnumName</h2>
+            </div>
+            <button class="drawer-close" id="drawerClose" aria-label="Close panel">
+                <!-- Close SVG -->
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="drawer-content">
+            <p class="enum-desc" id="drawerDesc">Detailed description here.</p>
+            
+            <div class="drawer-meta-section">
+                <div class="meta-field">
+                    <span class="meta-label">Namespace</span>
+                    <span class="meta-value" id="drawerNamespace">BFCAI.Nesyan.Domain.Entities</span>
+                </div>
+                <div class="meta-field">
+                    <span class="meta-label">Source File</span>
+                    <span class="meta-value" id="drawerFile">User.cs</span>
+                </div>
+            </div>
+
+            <!-- Tab Buttons -->
+            <div class="drawer-tabs">
+                <button class="drawer-tab active" data-tab="csharp" id="tabCsharp">C# Definition</button>
+                <button class="drawer-tab" data-tab="json" id="tabJson">JSON Mapping</button>
+                <button class="drawer-tab" data-tab="usage" id="tabUsage">Usage Model</button>
+            </div>
+
+            <!-- Tab Code Viewers -->
+            <!-- 1. C# -->
+            <div class="code-container active" id="codeCsharp">
+                <div class="code-header">
+                    <span>C# Source Structure</span>
+                    <button class="copy-code-btn" data-target="preCsharp" id="copyCsharpBtn">
+                        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        Copy
+                    </button>
+                </div>
+                <pre class="code-pre" id="preCsharp"></pre>
+            </div>
+
+            <!-- 2. JSON -->
+            <div class="code-container" id="codeJson">
+                <div class="code-header">
+                    <span>JSON Key-Value Reference</span>
+                    <button class="copy-code-btn" data-target="preJson" id="copyJsonBtn">
+                        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        Copy
+                    </button>
+                </div>
+                <pre class="code-pre" id="preJson"></pre>
+            </div>
+
+            <!-- 3. Usage -->
+            <div class="code-container" id="codeUsage">
+                <div class="code-header">
+                    <span>Entity Property Declaration</span>
+                    <button class="copy-code-btn" data-target="preUsage" id="copyUsageBtn">
+                        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        Copy
+                    </button>
+                </div>
+                <pre class="code-pre" id="preUsage"></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Banner -->
+    <div class="toast" id="toast" role="alert" aria-live="polite">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        <span id="toastMessage">Copied to Clipboard!</span>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 BFCAI.Nesyan Backend System. Responsive C# Enums Schema Directory.</p>
+    </footer>
+
+    <!-- Vanilla Javascript Logic -->
+    <script>
+        // Enums Dataset
+        const enumsData = [
+            {
+                name: "Gender",
+                namespace: "BFCAI.Nesyan.Domain.Entities.Primary",
+                category: "Primary",
+                file: "User.cs",
+                filePath: "BFCAI.Nesyan.Domain/Entities/_Primary/User.cs",
+                description: "Defines the gender classifications used standardly across all core system actors (Patients, Caregivers, Doctors, and Relatives) inside User profile models.",
+                values: [
+                    { name: "Male", val: 0 },
+                    { name: "Female", val: 1 }
+                ],
+                csharp: `namespace BFCAI.Nesyan.Domain.Entities.Primary\n{\n    public enum Gender\n    {\n        Male = 0,\n        Female = 1\n    }\n}`,
+                json: `{\n  "Male": 0,\n  "Female": 1\n}`,
+                usage: `public class User : BaseAuditableEntity<int>\n{\n    // ...\n    public Gender Gender { get; set; }\n}`
+            },
+            {
+                name: "AlzheimerStage",
+                namespace: "BFCAI.Nesyan.Domain.Entities.Primary.Patients",
+                category: "Primary",
+                file: "Patient.cs",
+                filePath: "BFCAI.Nesyan.Domain/Entities/_Primary/Patients/Patient.cs",
+                description: "Demarcates the clinical Alzheimer's progression stage of a patient to configure tailored care parameters, notification routines, and doctor dashboards.",
+                values: [
+                    { name: "Stage1_Mild", val: 1 },
+                    { name: "Stage2_Moderate", val: 2 },
+                    { name: "Stage3_Severe", val: 3 }
+                ],
+                csharp: `namespace BFCAI.Nesyan.Domain.Entities.Primary.Patients\n{\n    public enum AlzheimerStage\n    {\n        Stage1_Mild = 1,\n        Stage2_Moderate = 2,\n        Stage3_Severe = 3\n    }\n}`,
+                json: `{\n  "Stage1_Mild": 1,\n  "Stage2_Moderate": 2,\n  "Stage3_Severe": 3\n}`,
+                usage: `public class Patient : User\n{\n    // ...\n    public AlzheimerStage CurrentStage { get; set; }\n}`
+            },
+            {
+                name: "BloodType",
+                namespace: "BFCAI.Nesyan.Domain.Entities.Primary.Patients",
+                category: "Primary",
+                file: "Patient.cs",
+                filePath: "BFCAI.Nesyan.Domain/Entities/_Primary/Patients/Patient.cs",
+                description: "Represents standard physiological blood groups required for medical emergencies and clinical health profiles of patient entities.",
+                values: [
+                    { name: "A_Positive", val: 0 },
+                    { name: "A_Negative", val: 1 },
+                    { name: "B_Positive", val: 2 },
+                    { name: "B_Negative", val: 3 },
+                    { name: "AB_Positive", val: 4 },
+                    { name: "AB_Negative", val: 5 },
+                    { name: "O_Positive", val: 6 },
+                    { name: "O_Negative", val: 7 }
+                ],
+                csharp: `namespace BFCAI.Nesyan.Domain.Entities.Primary.Patients\n{\n    public enum BloodType\n    {\n        A_Positive = 0,\n        A_Negative = 1,\n        B_Positive = 2,\n        B_Negative = 3,\n        AB_Positive = 4,\n        AB_Negative = 5,\n        O_Positive = 6,\n        O_Negative = 7\n    }\n}`,
+                json: `{\n  "A_Positive": 0,\n  "A_Negative": 1,\n  "B_Positive": 2,\n  "B_Negative": 3,\n  "AB_Positive": 4,\n  "AB_Negative": 5,\n  "O_Positive": 6,\n  "O_Negative": 7\n}`,
+                usage: `public class Patient : User\n{\n    // ...\n    public BloodType BloodType { get; set; }\n}`
+            },
+            {
+                name: "AssessmentLevel",
+                namespace: "BFCAI.Nesyan.Domain.Entities.Assessments",
+                category: "Assessments",
+                file: "Assessment.cs",
+                filePath: "BFCAI.Nesyan.Domain/Entities/Assessments/Assessment.cs",
+                description: "Measures granular levels of mental/cognitive capacity, including name recognition, temporal awareness, geographic recognition, and focus during assessment runs.",
+                values: [
+                    { name: "Poor", val: 1 },
+                    { name: "Moderate", val: 2 },
+                    { name: "Good", val: 3 }
+                ],
+                csharp: `namespace BFCAI.Nesyan.Domain.Entities.Assessments\n{\n    public enum AssessmentLevel\n    {\n        Poor = 1,\n        Moderate = 2,\n        Good = 3\n    }\n}`,
+                json: `{\n  "Poor": 1,\n  "Moderate": 2,\n  "Good": 3\n}`,
+                usage: `public class Assessment : BaseAuditableEntity<int>\n{\n    public AssessmentLevel RecognitionOfName { get; set; }\n    public AssessmentLevel RecognitionOfPlace { get; set; }\n    public AssessmentLevel RecognitionOfTime { get; set; }\n    public AssessmentLevel AbilityToConcentrate { get; set; }\n    public AssessmentLevel RecallOfRecentEvents { get; set; }\n}`
+            },
+            {
+                name: "PsychologicalLevel",
+                namespace: "BFCAI.Nesyan.Domain.Entities.Assessments",
+                category: "Assessments",
+                file: "Assessment.cs",
+                filePath: "BFCAI.Nesyan.Domain/Entities/Assessments/Assessment.cs",
+                description: "Tracks presence levels of behavioral and mental distress symptoms (depression, anxiety, anger, aggression) for assessment analytics.",
+                values: [
+                    { name: "No", val: 1 },
+                    { name: "Sometimes", val: 2 },
+                    { name: "Yes", val: 3 }
+                ],
+                csharp: `namespace BFCAI.Nesyan.Domain.Entities.Assessments\n{\n    public enum PsychologicalLevel\n    {\n        No = 1,\n        Sometimes = 2,\n        Yes = 3\n    }\n}`,
+                json: `{\n  "No": 1,\n  "Sometimes": 2,\n  "Yes": 3\n}`,
+                usage: `public class Assessment : BaseAuditableEntity<int>\n{\n    public PsychologicalLevel AnxietyOrStress { get; set; }\n    public PsychologicalLevel DepressionOrSadness { get; set; }\n    public PsychologicalLevel Aggression { get; set; }\n}`
+            },
+            {
+                name: "IndependenceLevel",
+                namespace: "BFCAI.Nesyan.Domain.Entities.Assessments",
+                category: "Assessments",
+                file: "Assessment.cs",
+                filePath: "BFCAI.Nesyan.Domain/Entities/Assessments/Assessment.cs",
+                description: "Determines physical autonomy of patients across basic activities of daily living (eating, drinking, bathing, dressing, toilet usage, and mobility).",
+                values: [
+                    { name: "Dependent", val: 1 },
+                    { name: "NeedsAssistance", val: 2 },
+                    { name: "Independent", val: 3 }
+                ],
+                csharp: `namespace BFCAI.Nesyan.Domain.Entities.Assessments\n{\n    public enum IndependenceLevel\n    {\n        Dependent = 1,\n        NeedsAssistance = 2,\n        Independent = 3\n    }\n}`,
+                json: `{\n  "Dependent": 1,\n  "NeedsAssistance": 2,\n  "Independent": 3\n}`,
+                usage: `public class Assessment : BaseAuditableEntity<int>\n{\n    public IndependenceLevel EatingAndDrinking { get; set; }\n    public IndependenceLevel Bathing { get; set; }\n    public IndependenceLevel Dressing { get; set; }\n    public IndependenceLevel UsingBathroom { get; set; }\n    public IndependenceLevel Mobility { get; set; }\n}`
+            },
+            {
+                name: "ReminderType",
+                namespace: "BFCAI.Nesyan.Domain.Entities.Medications",
+                category: "Medications",
+                file: "Medications.cs",
+                filePath: "BFCAI.Nesyan.Domain/Entities/Medications/Medications.cs",
+                description: "Classifies patient notifications into specific actions: taking medical dosages, visiting specialized doctor appointments, or keeping general daily routines.",
+                values: [
+                    { name: "Medication", val: 1 },
+                    { name: "Appointment", val: 2 },
+                    { name: "Routine", val: 3 }
+                ],
+                csharp: `namespace BFCAI.Nesyan.Domain.Entities.Medications\n{\n    public enum ReminderType\n    {\n        Medication = 1,\n        Appointment = 2,\n        Routine = 3\n    }\n}`,
+                json: `{\n  "Medication": 1,\n  "Appointment": 2,\n  "Routine": 3\n}`,
+                usage: `public class Medication : BaseAuditableEntity<int>\n{\n    public ReminderType Type { get; set; }\n}`
+            },
+            {
+                name: "ReminderFrequency",
+                namespace: "BFCAI.Nesyan.Domain.Entities.Medications",
+                category: "Medications",
+                file: "Medications.cs",
+                filePath: "BFCAI.Nesyan.Domain/Entities/Medications/Medications.cs",
+                description: "Specifies how often reminder events will reoccur (one-time alerts, daily intervals, weekly repeats, monthly tasks, or customized parameters).",
+                values: [
+                    { name: "OneTime", val: 1 },
+                    { name: "Daily", val: 2 },
+                    { name: "Weekly", val: 3 },
+                    { name: "Monthly", val: 4 },
+                    { name: "Custom", val: 5 }
+                ],
+                csharp: `namespace BFCAI.Nesyan.Domain.Entities.Medications\n{\n    public enum ReminderFrequency\n    {\n        OneTime = 1,\n        Daily = 2,\n        Weekly = 3,\n        Monthly = 4,\n        Custom = 5\n    }\n}`,
+                json: `{\n  "OneTime": 1,\n  "Daily": 2,\n  "Weekly": 3,\n  "Monthly": 4,\n  "Custom": 5\n}`,
+                usage: `public class Medication : BaseAuditableEntity<int>\n{\n    public ReminderFrequency Frequency { get; set; }\n}`
+            },
+            {
+                name: "RequestStatus",
+                namespace: "BFCAI.Nesyan.Domain.Entities.Relations.Primary",
+                category: "Relations",
+                file: "RelativeDoctorRequest.cs",
+                filePath: "BFCAI.Nesyan.Domain/Entities/_Relations/Primary/RelativeDoctorRequest.cs",
+                description: "Maintains state flow for binding invitations between patients/relatives and professional healthcare doctors (pending initial dispatch, accepted, rejected, or selected).",
+                values: [
+                    { name: "Pending", val: 0 },
+                    { name: "Accepted", val: 1 },
+                    { name: "Rejected", val: 2 },
+                    { name: "Selected", val: 3 }
+                ],
+                csharp: `namespace BFCAI.Nesyan.Domain.Entities.Relations.Primary\n{\n    public enum RequestStatus\n    {\n        Pending = 0,\n        Accepted = 1,\n        Rejected = 2,\n        Selected = 3\n    }\n}`,
+                json: `{\n  "Pending": 0,\n  "Accepted": 1,\n  "Rejected": 2,\n  "Selected": 3\n}`,
+                usage: `public class RelativeDoctorRequest : BaseAuditableEntity<int>\n{\n    public RequestStatus Status { get; set; }\n}`
+            }
+        ];
+
+        // State variables
+        let currentFilter = "all";
+        let searchQuery = "";
+        let selectedEnum = null;
+        let activeTab = "csharp";
+
+        // DOM elements
+        const themeToggle = document.getElementById("themeToggle");
+        const searchInput = document.getElementById("searchInput");
+        const enumsGrid = document.getElementById("enumsGrid");
+        const drawer = document.getElementById("drawer");
+        const drawerOverlay = document.getElementById("drawerOverlay");
+        const drawerClose = document.getElementById("drawerClose");
+        const drawerTitle = document.getElementById("drawerTitle");
+        const drawerCategory = document.getElementById("drawerCategory");
+        const drawerDesc = document.getElementById("drawerDesc");
+        const drawerNamespace = document.getElementById("drawerNamespace");
+        const drawerFile = document.getElementById("drawerFile");
+
+        const tabCsharp = document.getElementById("tabCsharp");
+        const tabJson = document.getElementById("tabJson");
+        const tabUsage = document.getElementById("tabUsage");
+
+        const codeCsharp = document.getElementById("codeCsharp");
+        const codeJson = document.getElementById("codeJson");
+        const codeUsage = document.getElementById("codeUsage");
+
+        const preCsharp = document.getElementById("preCsharp");
+        const preJson = document.getElementById("preJson");
+        const preUsage = document.getElementById("preUsage");
+
+        const filterChips = document.querySelectorAll(".filter-chip");
+        const toast = document.getElementById("toast");
+        const toastMessage = document.getElementById("toastMessage");
+
+        // Theme Toggling Logic
+        themeToggle.addEventListener("click", () => {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute("data-theme");
+            const newTheme = currentTheme === "dark" ? "light" : "dark";
+            html.setAttribute("data-theme", newTheme);
+            localStorage.setItem("theme", newTheme);
+        });
+
+        // Initialize saved theme
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme) {
+            document.documentElement.setAttribute("data-theme", savedTheme);
+        }
+
+        // Render Grid Function
+        function renderGrid() {
+            enumsGrid.innerHTML = "";
+
+            const filteredData = enumsData.filter(item => {
+                const matchesFilter = currentFilter === "all" || item.category === currentFilter;
+                
+                const lowerSearch = searchQuery.toLowerCase();
+                const matchesSearch = 
+                    item.name.toLowerCase().includes(lowerSearch) ||
+                    item.namespace.toLowerCase().includes(lowerSearch) ||
+                    item.description.toLowerCase().includes(lowerSearch) ||
+                    item.values.some(v => v.name.toLowerCase().includes(lowerSearch) || v.val.toString() === lowerSearch);
+
+                return matchesFilter && matchesSearch;
+            });
+
+            if (filteredData.length === 0) {
+                enumsGrid.innerHTML = `
+                    <div class="no-results">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <h3>No enums found matching "${searchQuery}"</h3>
+                        <p style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">Try checking your spelling or selecting another filter category.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filteredData.forEach(item => {
+                const card = document.createElement("article");
+                card.className = "enum-card";
+                card.setAttribute("tabindex", "0");
+                card.setAttribute("aria-label", `${item.name} enumeration`);
+
+                const valuesHTML = item.values.map(v => `
+                    <div class="value-item">
+                        <span class="value-name">${v.name}</span>
+                        <span class="value-number">${v.val}</span>
+                    </div>
+                `).join("");
+
+                card.innerHTML = `
+                    <div class="enum-header">
+                        <div class="enum-namespace-row">
+                            <span class="enum-badge">${item.category}</span>
+                            <span class="enum-file-link">
+                                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                </svg>
+                                ${item.file}
+                            </span>
+                        </div>
+                        <h3 class="enum-title">${item.name}</h3>
+                    </div>
+                    <p class="enum-desc">${item.description}</p>
+                    <div class="enum-values-container">
+                        ${valuesHTML}
+                    </div>
+                    <div class="enum-card-footer">
+                        <span class="values-count">${item.values.length} Defined Options</span>
+                        <button class="inspect-btn">
+                            Inspect Code
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+                    </div>
+                `;
+
+                card.addEventListener("click", () => openDrawer(item));
+                card.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        openDrawer(item);
+                    }
+                });
+
+                enumsGrid.appendChild(card);
+            });
+        }
+
+        // Search Handlers
+        searchInput.addEventListener("input", (e) => {
+            searchQuery = e.target.value;
+            renderGrid();
+        });
+
+        // Filter Handlers
+        filterChips.forEach(chip => {
+            chip.addEventListener("click", () => {
+                filterChips.forEach(c => c.classList.remove("active"));
+                chip.classList.add("active");
+                currentFilter = chip.getAttribute("data-filter");
+                renderGrid();
+            });
+        });
+
+        // Dynamic Badge Counter Setup
+        function updateCounters() {
+            document.getElementById("countAll").textContent = enumsData.length;
+            document.getElementById("countPrimary").textContent = enumsData.filter(e => e.category === "Primary").length;
+            document.getElementById("countAssessments").textContent = enumsData.filter(e => e.category === "Assessments").length;
+            document.getElementById("countMedications").textContent = enumsData.filter(e => e.category === "Medications").length;
+            document.getElementById("countRelations").textContent = enumsData.filter(e => e.category === "Relations").length;
+        }
+
+        // Highlight C# Syntax helper (Simple client regex)
+        function syntaxHighlightCSharp(code) {
+            return code
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/\b(namespace|public|enum|class|get|set|int|double|string|bool)\b/g, '<span class="keyword">$1</span>')
+                .replace(/\b(Gender|AlzheimerStage|BloodType|AssessmentLevel|PsychologicalLevel|IndependenceLevel|ReminderType|ReminderFrequency|RequestStatus)\b/g, '<span class="type">$1</span>')
+                .replace(/(\d+)/g, '<span class="number">$1</span>')
+                .replace(/(\/\/.*)/g, '<span class="comment">$1</span>');
+        }
+
+        function syntaxHighlightJson(jsonString) {
+            return jsonString
+                .replace(/(".*?")(\s*:)/g, '<span class="keyword">$1</span>$2')
+                .replace(/(:\s*)(\d+)/g, '$1<span class="number">$2</span>');
+        }
+
+        // Drawer Control Functions
+        function openDrawer(item) {
+            selectedEnum = item;
+            drawerTitle.textContent = item.name;
+            drawerCategory.textContent = item.category;
+            drawerDesc.textContent = item.description;
+            drawerNamespace.textContent = item.namespace;
+            drawerFile.textContent = item.file;
+
+            preCsharp.innerHTML = syntaxHighlightCSharp(item.csharp);
+            preJson.innerHTML = syntaxHighlightJson(item.json);
+            preUsage.innerHTML = syntaxHighlightCSharp(item.usage);
+
+            activeTab = "csharp";
+            updateTabs();
+
+            drawerOverlay.classList.add("active");
+            drawer.classList.add("active");
+            document.body.style.overflow = "hidden"; // Prevent scrolling behind
+        }
+
+        function closeDrawer() {
+            drawerOverlay.classList.remove("active");
+            drawer.classList.remove("active");
+            document.body.style.overflow = ""; // Restore scrolling
+            selectedEnum = null;
+        }
+
+        drawerClose.addEventListener("click", closeDrawer);
+        drawerOverlay.addEventListener("click", closeDrawer);
+
+        // ESC Key close
+        window.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && selectedEnum) {
+                closeDrawer();
+            }
+        });
+
+        // Tab Switching Logic
+        const tabs = [
+            { btn: tabCsharp, pane: codeCsharp, name: "csharp" },
+            { btn: tabJson, pane: codeJson, name: "json" },
+            { btn: tabUsage, pane: codeUsage, name: "usage" }
+        ];
+
+        tabs.forEach(t => {
+            t.btn.addEventListener("click", () => {
+                activeTab = t.name;
+                updateTabs();
+            });
+        });
+
+        function updateTabs() {
+            tabs.forEach(t => {
+                if (t.name === activeTab) {
+                    t.btn.classList.add("active");
+                    t.pane.classList.add("active");
+                } else {
+                    t.btn.classList.remove("active");
+                    t.pane.classList.remove("active");
+                }
+            });
+        }
+
+        // Toast trigger
+        function showToast(message) {
+            toastMessage.textContent = message;
+            toast.classList.add("active");
+            setTimeout(() => {
+                toast.classList.remove("active");
+            }, 2500);
+        }
+
+        // Copy functionality
+        const copyButtons = document.querySelectorAll(".copy-code-btn");
+        copyButtons.forEach(btn => {
+            btn.addEventListener("click", () => {
+                const targetId = btn.getAttribute("data-target");
+                const codeElement = document.getElementById(targetId);
+                
+                // Extract plain text value
+                const textToCopy = codeElement.innerText;
+                
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    const originalHTML = btn.innerHTML;
+                    btn.innerHTML = `
+                        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Copied!
+                    `;
+                    btn.style.background = "var(--accent-secondary)";
+                    btn.style.color = "#ffffff";
+                    
+                    showToast(`${selectedEnum.name} snippet copied to clipboard!`);
+
+                    setTimeout(() => {
+                        btn.innerHTML = originalHTML;
+                        btn.style.background = "";
+                        btn.style.color = "";
+                    }, 2000);
+                }).catch(err => {
+                    console.error("Could not copy code snippet: ", err);
+                });
+            });
+        });
+
+        // Bootstrap the app
+        updateCounters();
+        renderGrid();
+
+    </script>
+</body>
+</html>
