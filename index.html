@@ -1142,6 +1142,24 @@
                 usage: `public class User : BaseAuditableEntity<int>\n{\n    // ...\n    public Gender Gender { get; set; }\n}`
             },
             {
+                name: "MaritalStatus",
+                namespace: "BFCAI.Nesyan.Domain.Entities.Primary",
+                category: "Primary",
+                file: "User.cs",
+                filePath: "BFCAI.Nesyan.Domain/Entities/_Primary/User.cs",
+                description: "Specifies the marital status of a user (such as Patient or Caregiver) to assist in personal profiling, social assessment, and customized system communication.",
+                values: [
+                    { name: "Single", val: 0 },
+                    { name: "Married", val: 1 },
+                    { name: "Divorced", val: 2 },
+                    { name: "Widowed", val: 3 },
+                    { name: "Separated", val: 4 }
+                ],
+                csharp: `namespace BFCAI.Nesyan.Domain.Entities.Primary\n{\n    public enum MaritalStatus\n    {\n        Single = 0,\n        Married = 1,\n        Divorced = 2,\n        Widowed = 3,\n        Separated = 4\n    }\n}`,
+                json: `{\n  "Single": 0,\n  "Married": 1,\n  "Divorced": 2,\n  "Widowed": 3,\n  "Separated": 4\n}`,
+                usage: `public class User : BaseAuditableEntity<int>\n{\n    // ...\n    public MaritalStatus MaritalStatus { get; set; }\n}`
+            },
+            {
                 name: "AlzheimerStage",
                 namespace: "BFCAI.Nesyan.Domain.Entities.Primary.Patients",
                 category: "Primary",
@@ -1445,7 +1463,7 @@
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;")
                 .replace(/\b(namespace|public|enum|class|get|set|int|double|string|bool)\b/g, '<span class="keyword">$1</span>')
-                .replace(/\b(Gender|AlzheimerStage|BloodType|AssessmentLevel|PsychologicalLevel|IndependenceLevel|ReminderType|ReminderFrequency|RequestStatus)\b/g, '<span class="type">$1</span>')
+                .replace(/\b(Gender|AlzheimerStage|BloodType|AssessmentLevel|PsychologicalLevel|IndependenceLevel|ReminderType|ReminderFrequency|RequestStatus|MaritalStatus)\b/g, '<span class="type">$1</span>')
                 .replace(/(\d+)/g, '<span class="number">$1</span>')
                 .replace(/(\/\/.*)/g, '<span class="comment">$1</span>');
         }
