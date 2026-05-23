@@ -1014,6 +1014,9 @@
                 <button class="filter-chip" data-filter="Relations" id="filterRelations">
                     Relations <span class="counter-badge" id="countRelations">1</span>
                 </button>
+                <button class="filter-chip" data-filter="MindGames" id="filterMindGames">
+                    Mind Games <span class="counter-badge" id="countMindGames">0</span>
+                </button>
             </div>
         </div>
 
@@ -1294,6 +1297,22 @@
                 csharp: `namespace BFCAI.Nesyan.Domain.Entities.Relations.Primary\n{\n    public enum RequestStatus\n    {\n        Pending = 0,\n        Accepted = 1,\n        Rejected = 2,\n        Selected = 3\n    }\n}`,
                 json: `{\n  "Pending": 0,\n  "Accepted": 1,\n  "Rejected": 2,\n  "Selected": 3\n}`,
                 usage: `public class RelativeDoctorRequest : BaseAuditableEntity<int>\n{\n    public RequestStatus Status { get; set; }\n}`
+            },
+            {
+                name: "PatternLevel",
+                namespace: "BFCAI.Nesyan.Domain.Entities.MindGames",
+                category: "MindGames",
+                file: "PatternLevel.cs",
+                filePath: "BFCAI.Nesyan.Domain/Entities/MindGames/PatternLevel.cs",
+                description: "Represents the dynamic difficulty and progression levels (level1, level2, level3) used inside Mind Games to configure patient pattern challenges and track cognitive scoring.",
+                values: [
+                    { name: "level1", val: 0 },
+                    { name: "level2", val: 1 },
+                    { name: "level3", val: 2 }
+                ],
+                csharp: `namespace BFCAI.Nesyan.Domain.Entities.MindGames\n{\n    public enum PatternLevel\n    {\n        level1 = 0,\n        level2 = 1,\n        level3 = 2\n    }\n}`,
+                json: `{\n  "level1": 0,\n  "level2": 1,\n  "level3": 2\n}`,
+                usage: `public class PatternGameRecord : BaseAuditableEntity<int>\n{\n    // ...\n    public PatternLevel PatternLevel { get; set; }\n}`
             }
         ];
 
@@ -1454,6 +1473,7 @@
             document.getElementById("countAssessments").textContent = enumsData.filter(e => e.category === "Assessments").length;
             document.getElementById("countMedications").textContent = enumsData.filter(e => e.category === "Medications").length;
             document.getElementById("countRelations").textContent = enumsData.filter(e => e.category === "Relations").length;
+            document.getElementById("countMindGames").textContent = enumsData.filter(e => e.category === "MindGames").length;
         }
 
         // Highlight C# Syntax helper (Simple client regex)
@@ -1463,7 +1483,7 @@
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;")
                 .replace(/\b(namespace|public|enum|class|get|set|int|double|string|bool)\b/g, '<span class="keyword">$1</span>')
-                .replace(/\b(Gender|AlzheimerStage|BloodType|AssessmentLevel|PsychologicalLevel|IndependenceLevel|ReminderType|ReminderFrequency|RequestStatus|MaritalStatus)\b/g, '<span class="type">$1</span>')
+                .replace(/\b(Gender|AlzheimerStage|BloodType|AssessmentLevel|PsychologicalLevel|IndependenceLevel|ReminderType|ReminderFrequency|RequestStatus|MaritalStatus|PatternLevel)\b/g, '<span class="type">$1</span>')
                 .replace(/(\d+)/g, '<span class="number">$1</span>')
                 .replace(/(\/\/.*)/g, '<span class="comment">$1</span>');
         }
